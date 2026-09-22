@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2026【500碗】高雄美食全指南｜74間得獎小吃・行政區分類・Google地圖標註</title>
+  <meta name="description" content="2026第4屆「500碗」全台小吃指南高雄完整得獎名單！收錄高雄12大行政區共74間得獎名店，含評審推薦標準、得獎菜色、精選美食圖鑑與Google地圖實時導航。" />
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="2026【500碗】高雄美食全指南｜74間得獎小吃特搜" />
+  <meta property="og:description" content="全高雄12大行政區・74間得獎名店・5間2碗殊榮・Google地圖一鍵導航！" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1200&auto=format&fit=crop&q=80" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;900&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet CSS for Map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    :root {
+      --primary: #C2410C; /* Terracotta Taiwan vibe */
+      --primary-hover: #9A3412;
+      --primary-light: #FFEDD5;
+      --gold: #D97706;
+      --gold-light: #FEF3C7;
+      --gold-dark: #92400E;
+      --dark: #0F172A;
+      --dark-card: #1E293B;
+      --gray-light: #F8FAFC;
+      --gray-border: #E2E8F0;
+      --text-main: #1E293B;
+      --text-muted: #64748B;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+      --shadow-hover: 0 20px 25px -5px rgba(0,0,0,0.12), 0 8px 10px -6px rgba(0,0,0,0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #F1F5F9;
+      color: var(--text-main);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Header & Hero */
+    header.hero {
+      background: linear-gradient(135deg, #1E1B4B 0%, #311042 50%, #431407 100%);
+      color: white;
+      padding: 60px 0 48px;
+      position: relative;
+      overflow: hidden;
+    }
+    header.hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.15) 0%, transparent 50%),
+                  radial-gradient(circle at 10% 80%, rgba(234, 88, 12, 0.15) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 6px 16px;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: #FDE68A;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+    }
+
+    .hero-title {
+      font-size: 2.8rem;
+      font-weight: 900;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .hero-title span {
+      background: linear-gradient(90deg, #FDE68A 0%, #F59E0B 50%, #FB923C 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 1.15rem;
+      color: #E2E8F0;
+      max-width: 800px;
+      margin-bottom: 32px;
+      font-weight: 400;
+    }
+
+    /* Stat Cards */
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .stat-item {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      text-align: center;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .stat-item:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 800;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #FDE68A;
+      display: block;
+      line-height: 1.1;
+    }
+    .stat-label {
+      font-size: 0.85rem;
+      color: #CBD5E1;
+      margin-top: 4px;
+    }
+
+    /* Criteria Section */
+    .criteria-section {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      margin: -24px auto 36px;
+      position: relative;
+      z-index: 10;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--gray-border);
+    }
+    .criteria-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .criteria-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--primary-light);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+    .criteria-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--dark);
+    }
+    .criteria-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .criteria-card {
+      background: #F8FAFC;
+      border-radius: var(--radius-md);
+      padding: 20px;
+      border-left: 4px solid var(--primary);
+    }
+    .criteria-card.gold {
+      background: #FFFBEB;
+      border-left-color: var(--gold);
+    }
+    .criteria-card-title {
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .criteria-card-title.gold {
+      color: var(--gold-dark);
+    }
+    .criteria-card-title.normal {
+      color: var(--primary);
+    }
+    .criteria-card p {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Map Section */
+    .map-section {
+      margin-bottom: 48px;
+    }
+    .section-title-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .section-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title i {
+      color: var(--primary);
+    }
+    .map-controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+    .btn-outline {
+      background: white;
+      border-color: var(--gray-border);
+      color: var(--text-main);
+    }
+    .btn-outline:hover {
+      background: #F1F5F9;
+      border-color: #CBD5E1;
+    }
+    .btn-outline.active {
+      background: #EDE9FE;
+      color: #5B21B6;
+      border-color: #DDD6FE;
+    }
+
+    .map-wrapper {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 12px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--gray-border);
+      position: relative;
+    }
+    #kaohsiung-map {
+      height: 520px;
+      width: 100%;
+      border-radius: var(--radius-md);
+      z-index: 1;
+    }
+    .map-iframe-container {
+      height: 520px;
+      width: 100%;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      display: none;
+    }
+    .map-iframe-container iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    /* Map Tooltip & Popup */
+    .leaflet-popup-content-wrapper {
+      border-radius: var(--radius-md);
+      padding: 4px;
+      box-shadow: var(--shadow-lg);
+    }
+    .map-popup-card {
+      max-width: 260px;
+    }
+    .map-popup-img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    .map-popup-title {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 4px;
+      color: var(--dark);
+    }
+    .map-popup-dish {
+      font-size: 0.82rem;
+      color: var(--primary);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .map-popup-addr {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .map-popup-btn {
+      display: block;
+      text-align: center;
+      background: #2563EB;
+      color: white !important;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .map-popup-btn:hover {
+      background: #1D4ED8;
+    }
+
+    /* Filters & Search */
+    .filter-sticky-bar {
+      position: sticky;
+      top: 12px;
+      z-index: 99;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(12px);
+      border-radius: var(--radius-md);
+      padding: 14px 20px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--gray-border);
+      margin-bottom: 32px;
+    }
+    .filter-top-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 240px;
+    }
+    .search-box i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94A3B8;
+    }
+    .search-input {
+      width: 100%;
+      padding: 10px 14px 10px 38px;
+      border-radius: 9999px;
+      border: 1px solid #CBD5E1;
+      font-size: 0.92rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(194, 65, 12, 0.15);
+    }
+
+    .filter-count {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .filter-count strong {
+      color: var(--primary);
+      font-size: 1.1rem;
+    }
+
+    .district-pills {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: thin;
+    }
+    .pill {
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: #F1F5F9;
+      color: #475569;
+      cursor: pointer;
+      white-space: nowrap;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pill:hover {
+      background: #E2E8F0;
+      color: var(--dark);
+    }
+    .pill.active {
+      background: var(--primary);
+      color: white;
+    }
+    .pill.gold-pill.active {
+      background: linear-gradient(135deg, #D97706, #B45309);
+      color: white;
+    }
+    .pill-count {
+      background: rgba(0,0,0,0.08);
+      padding: 1px 6px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+    }
+    .pill.active .pill-count {
+      background: rgba(255,255,255,0.25);
+    }
+
+    /* Restaurant Grid */
+    .restaurant-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 24px;
+      margin-bottom: 60px;
+    }
+
+    .card {
+      background: white;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--gray-border);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-hover);
+      border-color: #CBD5E1;
+    }
+
+    .card-img-wrap {
+      position: relative;
+      height: 210px;
+      overflow: hidden;
+      background: #E2E8F0;
+    }
+    .card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .card:hover .card-img {
+      transform: scale(1.05);
+    }
+
+    /* Badges */
+    .badge-bowl {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      padding: 6px 12px;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+      z-index: 2;
+    }
+    .badge-bowl.gold {
+      background: linear-gradient(135deg, #F59E0B, #D97706);
+      color: white;
+      border: 1px solid #FDE68A;
+      animation: pulse-gold 2.5s infinite;
+    }
+    @keyframes pulse-gold {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+    }
+    .badge-bowl.silver {
+      background: rgba(15, 23, 42, 0.85);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .badge-district {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(255, 255, 255, 0.95);
+      color: #334155;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      z-index: 2;
+    }
+
+    .card-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .card-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--dark);
+      line-height: 1.3;
+    }
+    .card-cuisine {
+      font-size: 0.75rem;
+      background: #F1F5F9;
+      color: #64748B;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* Winning dish block */
+    .winning-dish-block {
+      background: #FFF7ED;
+      border: 1px solid #FFEDD5;
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      margin-bottom: 14px;
+    }
+    .winning-dish-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #C2410C;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .winning-dish-text {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #7C2D12;
+      line-height: 1.4;
+    }
+
+    /* Judges */
+    .judges-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 12px;
+      font-size: 0.82rem;
+      color: #475569;
+    }
+    .judges-row i {
+      color: #D97706;
+    }
+    .judges-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .judge-chip {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      padding: 1px 8px;
+      border-radius: 9999px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    /* Meta Info */
+    .card-meta {
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid var(--gray-border);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .meta-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.4;
+    }
+    .meta-item i {
+      width: 14px;
+      margin-top: 3px;
+      color: #94A3B8;
+    }
+
+    /* Card Actions */
+    .card-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .btn-map-nav {
+      background: #2563EB;
+      color: white;
+      text-align: center;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+    .btn-map-nav:hover {
+      background: #1D4ED8;
+    }
+    .btn-locate {
+      background: #F1F5F9;
+      color: #334155;
+      text-align: center;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border: 1px solid #E2E8F0;
+      transition: all 0.2s;
+    }
+    .btn-locate:hover {
+      background: #E2E8F0;
+      color: var(--dark);
+    }
+
+    /* Empty state */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 20px;
+      background: white;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--gray-border);
+    }
+    .empty-state i {
+      font-size: 3rem;
+      color: #CBD5E1;
+      margin-bottom: 16px;
+    }
+    .empty-state h3 {
+      font-size: 1.2rem;
+      color: var(--dark);
+      margin-bottom: 8px;
+    }
+    .empty-state p {
+      color: var(--text-muted);
+    }
+
+    /* Footer */
+    footer {
+      background: var(--dark);
+      color: #94A3B8;
+      padding: 48px 0 32px;
+      margin-top: 60px;
+      border-top: 1px solid #334155;
+    }
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    .footer-brand {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: white;
+    }
+    .footer-links a {
+      color: #CBD5E1;
+      text-decoration: none;
+      margin-left: 20px;
+      font-size: 0.88rem;
+    }
+    .footer-links a:hover {
+      color: #FDE68A;
+    }
+    .footer-copy {
+      text-align: center;
+      font-size: 0.82rem;
+      border-top: 1px solid #1E293B;
+      padding-top: 24px;
+    }
+
+    /* Custom Leaflet Marker Pulse */
+    .marker-pin-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pin-2bowls {
+      width: 32px;
+      height: 32px;
+      border-radius: 50% 50% 50% 0;
+      background: #D97706;
+      position: absolute;
+      transform: rotate(-45deg);
+      left: 50%;
+      top: 50%;
+      margin: -16px 0 0 -16px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #FFFFFF;
+    }
+    .pin-2bowls span {
+      transform: rotate(45deg);
+      color: white;
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .pin-1bowl {
+      width: 28px;
+      height: 28px;
+      border-radius: 50% 50% 50% 0;
+      background: #C2410C;
+      position: absolute;
+      transform: rotate(-45deg);
+      left: 50%;
+      top: 50%;
+      margin: -14px 0 0 -14px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #FFFFFF;
+    }
+    .pin-1bowl span {
+      transform: rotate(45deg);
+      color: white;
+      font-weight: 700;
+      font-size: 11px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 2rem;
+      }
+      .criteria-grid {
+        grid-template-columns: 1fr;
+      }
+      .restaurant-grid {
+        grid-template-columns: 1fr;
+      }
+      #kaohsiung-map {
+        height: 400px;
+      }
+      .filter-top-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero Header -->
+  <header class="hero">
+    <div class="container">
+      <div class="hero-badge">
+        <i class="fa-solid fa-bowl-food"></i> 500輯 台灣首份在地小吃評鑑
+      </div>
+      <h1 class="hero-title">
+        2026【500碗】<span>高雄美食全指南</span>
+      </h1>
+      <p class="hero-subtitle">
+        嚴選全高雄 12 大行政區・74 間得獎神級小吃！由名廚江振誠、簡天才、世界麵包冠軍吳寶春等50位跨界評審傾心推選，收錄得獎菜色、評選標準與實時地圖導航。
+      </p>
+
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-number">74</span>
+          <span class="stat-label">入選店家總數</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">12</span>
+          <span class="stat-label">橫跨行政分區</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" style="color: #FBBF24;">5</span>
+          <span class="stat-label">🏆 2碗跨界首選</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">69</span>
+          <span class="stat-label">⭐ 1碗在地經典</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">50</span>
+          <span class="stat-label">位專業跨界評審</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- 評選標準與制度說明 -->
+    <section class="criteria-section">
+      <div class="criteria-header">
+        <div class="criteria-icon">
+          <i class="fa-solid fa-award"></i>
+        </div>
+        <div>
+          <h2 class="criteria-title">500碗評選標準與碗數指標說明</h2>
+          <p style="font-size: 0.88rem; color: var(--text-muted);">源自聯合報系《500輯》，打造專屬於台灣人的在地飲食指南</p>
+        </div>
+      </div>
+
+      <div class="criteria-grid">
+        <div class="criteria-card gold">
+          <div class="criteria-card-title gold">
+            <i class="fa-solid fa-trophy"></i> 【2碗得主】跨界共同強推（高雄共 5 間）
+          </div>
+          <p>
+            <strong>評選標準：</strong>同時獲得兩位以上來自不同領域的專業評審（如米其林名廚、飲食專欄作家、文化生活家）共同投票推舉。代表該小吃不僅擁有老店傳統底蘊或創新驚艷技藝，更具備跨世代、跨領域的無懈可擊美味實力。
+          </p>
+          <div style="margin-top: 10px; font-size: 0.85rem; color: #B45309; font-weight: 600;">
+            👑 高雄二碗名店：北港蔡三代筒仔米糕、正宗鴨肉飯、金獅湖肉包、迪記法式豬舌飯、清溪小吃部
+          </div>
+        </div>
+
+        <div class="criteria-card">
+          <div class="criteria-card-title normal">
+            <i class="fa-solid fa-star"></i> 【1碗得主】評審私房專屬推薦（高雄共 69 間）
+          </div>
+          <p>
+            <strong>評選標準：</strong>每位評審以個人真誠味蕾出發，推選出的心頭好「私房名單」。獲頒1碗之店家，象徵著深入在地巷弄、長年堅持火候手藝與人情溫度的美味代表，是走訪高雄最值得親臨的日常珍饈。
+          </p>
+          <div style="margin-top: 10px; font-size: 0.85rem; color: var(--primary); font-weight: 600;">
+            ✨ 涵蓋鹽埕老麵館、前金切仔料、三民鴨肉飯、楠梓河粉、旗山老街冬粉等多元風味
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Part 1: 地圖標註專區 -->
+    <section class="map-section" id="map-part">
+      <div class="section-title-bar">
+        <div>
+          <h2 class="section-title">
+            <i class="fa-solid fa-location-dot"></i> 高雄得獎美食 Google 地圖標註專區
+          </h2>
+          <p style="font-size: 0.92rem; color: var(--text-muted); margin-top: 4px;">
+            在地圖上已標註高雄地區全數 74 間得獎餐廳。點擊圖釘可查看招牌推薦菜色與評審，並直接開啟 Google 地圖一鍵導航。
+          </p>
+        </div>
+        <div class="map-controls">
+          <button class="btn btn-outline active" id="btn-toggle-custom-map" onclick="switchMapMode('leaflet')">
+            <i class="fa-solid fa-map-location-dot"></i> 精準互動標註地圖
+          </button>
+          <button class="btn btn-outline" id="btn-toggle-google-embed" onclick="switchMapMode('google')">
+            <i class="fa-brands fa-google"></i> 官方 500碗 Google My Maps
+          </button>
+          <button class="btn btn-primary" onclick="resetMapView()">
+            <i class="fa-solid fa-compress"></i> 重設全高雄視野
+          </button>
+        </div>
+      </div>
+
+      <div class="map-wrapper">
+        <!-- Interactive Leaflet Map with Google Maps Tile & Pins -->
+        <div id="kaohsiung-map"></div>
+
+        <!-- Official Google My Maps Embed Iframe -->
+        <div id="google-embed-container" class="map-iframe-container">
+          <iframe 
+            src="https://www.google.com/maps/d/embed?mid=19E5ausxMMacpaiOhadZFvns_UOlgFNo&hl=zh-TW&ehbc=2E312F" 
+            title="500碗官方 Google My Maps"
+            loading="lazy">
+          </iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- Part 2: 行政區分類與餐廳圖鑑專區 -->
+    <section id="restaurant-catalog">
+      <div class="section-title-bar">
+        <div>
+          <h2 class="section-title">
+            <i class="fa-solid fa-utensils"></i> 行政區分類美食圖鑑
+          </h2>
+          <p style="font-size: 0.92rem; color: var(--text-muted); margin-top: 4px;">
+            依行政區快速篩選，搭配高畫質美味菜色視覺與評審陣容
+          </p>
+        </div>
+      </div>
+
+      <!-- Sticky Filter & Search Bar -->
+      <div class="filter-sticky-bar">
+        <div class="filter-top-row">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="search-input" class="search-input" placeholder="搜尋店名、推薦菜色、評審（如 江振誠、簡天才）、路名..." oninput="handleSearch()" />
+          </div>
+          <div class="filter-count">
+            目前顯示：<strong id="display-count">74</strong> 間餐廳
+          </div>
+        </div>
+
+        <div class="district-pills" id="district-pills">
+          <div class="pill active" data-district="all" onclick="filterByDistrict('all')">
+            全部地區 <span class="pill-count">74</span>
+          </div>
+          <div class="pill gold-pill" data-district="2bowls" onclick="filterByDistrict('2bowls')">
+            🏆 2碗必吃 <span class="pill-count">5</span>
+          </div>
+          <!-- District pills generated dynamically -->
+        </div>
+      </div>
+
+      <!-- Restaurant Cards Grid -->
+      <div class="restaurant-grid" id="restaurant-grid">
+        <!-- Cards rendered via JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div>
+          <div class="footer-brand">
+            <i class="fa-solid fa-bowl-food" style="color: #F59E0B; margin-right: 8px;"></i>
+            2026【500碗】高雄美食全指南
+          </div>
+          <p style="font-size: 0.85rem; margin-top: 6px; color: #94A3B8;">
+            資料來源：500輯《THE 500 BOWLS AWARD》得獎名單與官方地圖導覽
+          </p>
+        </div>
+        <div class="footer-links">
+          <a href="https://500times.udn.com/wtimes/story/123497/9547367" target="_blank" rel="noopener">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> 500輯官方文章
+          </a>
+          <a href="https://udn.com/500bowlsaward/" target="_blank" rel="noopener">
+            <i class="fa-solid fa-globe"></i> 500碗評鑑官網
+          </a>
+          <a href="https://reurl.cc/kpRv1q" target="_blank" rel="noopener">
+            <i class="fa-solid fa-map"></i> 官方Google地圖
+          </a>
+        </div>
+      </div>
+      <div class="footer-copy">
+        高雄得獎小吃・專題整理發佈 ｜ 隨時隨地開啟 Google 地圖出發尋味！
+      </div>
+    </div>
+  </footer>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <script>
+    // Full Data of 74 Kaohsiung Restaurants
+    const RESTAURANTS = [{"name": "清溪小吃部", "bowls": 2, "district": "三民區", "dishes": "蝦丸仔湯、肉燥飯", "judges": "薛舜迪、Nobu Lee", "cuisine": "台式", "address": "807高雄市三民區三鳳中街80之1號", "hours": "11:30–19:30", "phone": "07 286 7767", "lat": 22.6382, "lng": 120.2958, "image": "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=900&auto=format&fit=crop&q=80"}, {"name": "饅頭達人｜金獅湖肉包", "bowls": 2, "district": "三民區", "dishes": "肉包", "judges": "洪嘉聰、吳寶春", "cuisine": "台式", "address": "807高雄市三民區鼎金後路45號", "hours": "10:30–17:30", "phone": "07 342 7175", "lat": 22.6685, "lng": 120.3259, "image": "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=900&auto=format&fit=crop&q=80"}, {"name": "北港蔡三代筒仔米糕", "bowls": 2, "district": "鹽埕區", "dishes": "蒸蛋湯、筒仔米糕", "judges": "簡天才、江振誠", "cuisine": "台式", "address": "803高雄市鹽埕區河西路167號", "hours": "12:00–20:00", "phone": "07 551 7443", "lat": 22.6212, "lng": 120.2871, "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=900&auto=format&fit=crop&q=80"}, {"name": "正宗鴨肉飯", "bowls": 2, "district": "左營區", "dishes": "鴨肉飯", "judges": "簡天才、李易", "cuisine": "台式", "address": "813高雄市左營區裕誠路245號", "hours": "11:00–20:30", "phone": "07 556 6428", "lat": 22.6612, "lng": 120.3044, "image": "https://images.unsplash.com/photo-1514944298352-f1797c23f2b6?w=900&auto=format&fit=crop&q=80"}, {"name": "迪記法式豬舌飯", "bowls": 2, "district": "左營區", "dishes": "致敬阿明的舒肥豬心、舒肥豬舌佐蒜味酸奶、招牌炭香三寶豬舌飯", "judges": "楊馥如、馬世芳", "cuisine": "歐美", "address": "813高雄市左營區富國路60號龍華市場108攤", "hours": "11:30–13:30 16:30–19:00", "phone": "0974 274 313", "lat": 22.659, "lng": 120.3035, "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=900&auto=format&fit=crop&q=80"}, {"name": "七美麵店", "bowls": 1, "district": "三民區", "dishes": "乾麵 豬頭皮", "judges": "黃鐙輝", "cuisine": "台式", "address": "807高雄市三民區大豐一路93號", "hours": "10:00–21:30", "phone": "07 381 3832", "lat": 22.6496, "lng": 120.3272, "image": "https://images.unsplash.com/photo-1612927601601-6638404737ce?w=900&auto=format&fit=crop&q=80"}, {"name": "三塊厝鴨肉飯", "bowls": 1, "district": "三民區", "dishes": "當歸下水湯", "judges": "洪嘉聰", "cuisine": "台式", "address": "807高雄市三民區三民街192號", "hours": "11:30–15:00 16:30–19:00", "phone": "07 271 0188", "lat": 22.6329, "lng": 120.2965, "image": "https://images.unsplash.com/photo-1518492104633-130d0cc84637?w=900&auto=format&fit=crop&q=80"}, {"name": "中都外省麵", "bowls": 1, "district": "三民區", "dishes": "牛肉麵、乾麵", "judges": "薛舜迪", "cuisine": "台式", "address": "807高雄市三民區中都街63號", "hours": "11:00–15:00 16:00–21:00", "phone": "", "lat": 22.6396, "lng": 120.2898, "image": "https://images.unsplash.com/photo-1552611052-33e04de081de?w=900&auto=format&fit=crop&q=80"}, {"name": "侯記鴨肉飯", "bowls": 1, "district": "三民區", "dishes": "鴨肉飯、當歸下水湯", "judges": "薛舜迪", "cuisine": "台式", "address": "807高雄市三民區自強一路201號", "hours": "10:00–19:30", "phone": "07 282 7588", "lat": 22.6335, "lng": 120.2966, "image": "https://images.unsplash.com/photo-1514944298352-f1797c23f2b6?w=900&auto=format&fit=crop&q=80"}, {"name": "古早味謝家肉粽", "bowls": 1, "district": "三民區", "dishes": "鹼粽", "judges": "吳寶春", "cuisine": "台式", "address": "807高雄市三民區大豐一路286號", "hours": "08:30–18:30", "phone": "07 380 0001", "lat": 22.6488, "lng": 120.3296, "image": "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=900&auto=format&fit=crop&q=80"}, {"name": "君腳庫飯", "bowls": 1, "district": "三民區", "dishes": "腳庫飯", "judges": "簡天才", "cuisine": "台式", "address": "807高雄市三民區漢口街103號", "hours": "10:30–20:30", "phone": "0979 777 818", "lat": 22.642, "lng": 120.3032, "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=900&auto=format&fit=crop&q=80"}, {"name": "味津排骨大王", "bowls": 1, "district": "三民區", "dishes": "綜合飯（排骨加雞腿魚排組合）", "judges": "薛舜迪", "cuisine": "台式", "address": "807高雄市三民區中庸街57號", "hours": "10:30–14:00 16:30–19:30", "phone": "07 231 2919", "lat": 22.6348, "lng": 120.2902, "image": "https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=900&auto=format&fit=crop&q=80"}, {"name": "和合樂屋日式蔬食", "bowls": 1, "district": "三民區", "dishes": "綜合壽司", "judges": "顏博文", "cuisine": "素食", "address": "807高雄市三民區鼎瑞街110號", "hours": "11:30–14:00 17:30–21:00", "phone": "07 310 2111", "lat": 22.6706, "lng": 120.3202, "image": "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=900&auto=format&fit=crop&q=80"}, {"name": "嘟嘟炒鱔魚意麵", "bowls": 1, "district": "三民區", "dishes": "乾炒鱔魚麵", "judges": "陳陸寬", "cuisine": "台式", "address": "807高雄市三民區哈爾濱街101號", "hours": "17:00–22:00", "phone": "0987 041 113", "lat": 22.6402, "lng": 120.301, "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=900&auto=format&fit=crop&q=80"}, {"name": "方家古早味雞蛋酥", "bowls": 1, "district": "三民區", "dishes": "原味雞蛋酥", "judges": "陳陸寬", "cuisine": "台式", "address": "807高雄市三民區大連街129號騎樓下", "hours": "13:00–19:00", "phone": "0917 117 091", "lat": 22.6424, "lng": 120.3096, "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=900&auto=format&fit=crop&q=80"}, {"name": "曹家麵館", "bowls": 1, "district": "三民區", "dishes": "麻辣大腸乾麵", "judges": "黃鐙輝", "cuisine": "台式", "address": "807高雄市三民區正忠路148號", "hours": "06:30–14:00 17:00–22:30", "phone": "07 395 6873", "lat": 22.6463, "lng": 120.3324, "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=900&auto=format&fit=crop&q=80"}, {"name": "爵士冰城 大連店", "bowls": 1, "district": "三民區", "dishes": "驚奇鹹酥雞", "judges": "陳陸寬", "cuisine": "台式", "address": "807高雄市三民區大連街297號", "hours": "11:00–21:00", "phone": "07 322 0807", "lat": 22.6448, "lng": 120.3088, "image": "https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=900&auto=format&fit=crop&q=80"}, {"name": "萬來豬血湯", "bowls": 1, "district": "三民區", "dishes": "大腸豬血湯 炒米粉", "judges": "黃鐙輝", "cuisine": "台式", "address": "807高雄市三民區建工路222號", "hours": "10:00–17:10", "phone": "07 383 7077", "lat": 22.6536, "lng": 120.3242, "image": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=900&auto=format&fit=crop&q=80"}, {"name": "郭海產", "bowls": 1, "district": "三民區", "dishes": "高麗菜酸炒鮢過魚", "judges": "楊馥如", "cuisine": "台式", "address": "807高雄市三民區大順二路614號", "hours": "17:00–00:30", "phone": "07 383 5645", "lat": 22.6454, "lng": 120.3212, "image": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=900&auto=format&fit=crop&q=80"}, {"name": "阿萬意麵", "bowls": 1, "district": "三民區", "dishes": "乾意麵、肉羹", "judges": "薛舜迪", "cuisine": "台式", "address": "807高雄市三民區三民街184號", "hours": "15:30–21:00", "phone": "07 231 3207", "lat": 22.6353, "lng": 120.2973, "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=900&auto=format&fit=crop&q=80"}, {"name": "鴨肉和", "bowls": 1, "district": "三民區", "dishes": "當歸鴨心湯", "judges": "簡天才", "cuisine": "台式", "address": "807高雄市三民區建國三路395-1號", "hours": "10:30–20:00", "phone": "07 281 2988", "lat": 22.635, "lng": 120.2948, "image": "https://images.unsplash.com/photo-1514944298352-f1797c23f2b6?w=900&auto=format&fit=crop&q=80"}, {"name": "鶴笙麵屋手工日式蕎麥麵", "bowls": 1, "district": "三民區", "dishes": "手工日式蕎麥麵", "judges": "郭銘哲", "cuisine": "台式", "address": "807高雄市三民區新民路124號", "hours": "12:00–14:00 17:00–20:00", "phone": "07 383 5029", "lat": 22.6548, "lng": 120.3216, "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=900&auto=format&fit=crop&q=80"}, {"name": "鼎盛號-三民店", "bowls": 1, "district": "三民區", "dishes": "排骨炒飯", "judges": "黃鐙輝", "cuisine": "台式", "address": "80781高雄市三民區正忠路245號", "hours": "11:00–14:00 17:00–21:00", "phone": "07 396 3257", "lat": 22.6439, "lng": 120.334, "image": "https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=900&auto=format&fit=crop&q=80"}, {"name": "353汕頭香Q麵", "bowls": 1, "district": "鹽埕區", "dishes": "汕頭麵", "judges": "迪拉", "cuisine": "台式", "address": "803高雄市鹽埕區新樂街221-1號", "hours": "17:00–00:00", "phone": "07 551 6333", "lat": 22.624, "lng": 120.281, "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=900&auto=format&fit=crop&q=80"}, {"name": "下一鍋水煎包", "bowls": 1, "district": "鹽埕區", "dishes": "水煎包", "judges": "薛舜迪", "cuisine": "台式", "address": "803高雄市鹽埕區大禮街24號", "hours": "14:00–18:30", "phone": "0915 010 853", "lat": 22.6212, "lng": 120.2831, "image": "https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?w=900&auto=format&fit=crop&q=80"}, {"name": "勇伯冬粉豬舌", "bowls": 1, "district": "鹽埕區", "dishes": "豬舌冬粉", "judges": "黃鐙輝", "cuisine": "台式", "address": "803高雄市鹽埕區必信街56-1號", "hours": "07:00–14:00", "phone": "07 531 2520", "lat": 22.6221, "lng": 120.2838, "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=900&auto=format&fit=crop&q=80"}, {"name": "大義街無名麵店", "bowls": 1, "district": "鹽埕區", "dishes": "乾麵", "judges": "郭銘哲", "cuisine": "台式", "address": "803高雄市鹽埕區大義街64號", "hours": "10:30–19:00", "phone": "07 532 2176", "lat": 22.6194, "lng": 120.2853, "image": "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=900&auto=format&fit=crop&q=80"}, {"name": "山壹旗魚食製所YAMA ICHI Tempura", "bowls": 1, "district": "鹽埕區", "dishes": "全炸綜合", "judges": "郭銘哲", "cuisine": "台式", "address": "803高雄市鹽埕區瀨南街141-7號鹽一市場乙-23、24號攤", "hours": "08:00–12:00 17:00–20:00", "phone": "0963 510 993", "lat": 22.6253, "lng": 120.2833, "image": "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=900&auto=format&fit=crop&q=80"}, {"name": "曾記廚房", "bowls": 1, "district": "鹽埕區", "dishes": "魚翅羹", "judges": "蔣勳", "cuisine": "台式", "address": "803高雄市鹽埕區新樂街162號", "hours": "11:00–14:00 17:00–20:00", "phone": "07 531 2881", "lat": 22.6248, "lng": 120.281, "image": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=900&auto=format&fit=crop&q=80"}, {"name": "老蔡虱目魚粥", "bowls": 1, "district": "鹽埕區", "dishes": "虱目魚粥 雞肉飯 肉燥飯", "judges": "陳泰銘", "cuisine": "台式", "address": "803高雄市鹽埕區瀨南街201號", "hours": "06:00–13:30", "phone": "07 551 9689", "lat": 22.6237, "lng": 120.2817, "image": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=900&auto=format&fit=crop&q=80"}, {"name": "藍世界啤酒屋 Focus PUB", "bowls": 1, "district": "鹽埕區", "dishes": "牛三寶乾拌麵、剁絲黃瓜牛肉煎餃、家常熱炒", "judges": "郭銘哲", "cuisine": "台式", "address": "803高雄市鹽埕區五福四路88號", "hours": "19:00–03:00", "phone": "07 561 6901", "lat": 22.6202, "lng": 120.2854, "image": "https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=900&auto=format&fit=crop&q=80"}, {"name": "鄭家切仔麵", "bowls": 1, "district": "鹽埕區", "dishes": "黑白切 乾麵 湯米粉", "judges": "陳泰銘", "cuisine": "台式", "address": "803高雄市鹽埕區新樂街201巷5號", "hours": "08:00–15:00", "phone": "07 561 0706", "lat": 22.624, "lng": 120.2826, "image": "https://images.unsplash.com/photo-1552611052-33e04de081de?w=900&auto=format&fit=crop&q=80"}, {"name": "阿男燒烤", "bowls": 1, "district": "鹽埕區", "dishes": "燒烤各品", "judges": "肥波開吃啦", "cuisine": "台式", "address": "803高雄市鹽埕區新樂街229-1號", "hours": "18:00–23:30", "phone": "07 561 8929", "lat": 22.6264, "lng": 120.2818, "image": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=900&auto=format&fit=crop&q=80"}, {"name": "阿財雞絲麵", "bowls": 1, "district": "鹽埕區", "dishes": "乾雞絲麵、黑白切", "judges": "薛舜迪", "cuisine": "台式", "address": "803高雄市鹽埕區壽星街11號", "hours": "11:30–21:00", "phone": "07 521 5151", "lat": 22.6215, "lng": 120.281, "image": "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=900&auto=format&fit=crop&q=80"}, {"name": "55年老店豬血湯", "bowls": 1, "district": "新興區", "dishes": "大腸豬血湯", "judges": "吳寶春", "cuisine": "台式", "address": "800高雄市新興區大同一路221號", "hours": "08:00–19:30", "phone": "07 221 3069", "lat": 22.6266, "lng": 120.3007, "image": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=900&auto=format&fit=crop&q=80"}, {"name": "全鵝肉海鮮", "bowls": 1, "district": "新興區", "dishes": "鹹酥鴨舌頭", "judges": "洪嘉聰", "cuisine": "台式", "address": "800高雄市新興區八德一路69號", "hours": "17:00–22:00", "phone": "07 236 1589", "lat": 22.6339, "lng": 120.3064, "image": "https://images.unsplash.com/photo-1518492104633-130d0cc84637?w=900&auto=format&fit=crop&q=80"}, {"name": "姚家蘭州拉麵", "bowls": 1, "district": "新興區", "dishes": "辣雞麵", "judges": "吳寶春", "cuisine": "中式", "address": "800高雄市新興區青年一路176巷12號", "hours": "11:30–14:00 17:30–20:30", "phone": "07 223 2789", "lat": 22.6209, "lng": 120.3104, "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=900&auto=format&fit=crop&q=80"}, {"name": "新營鵝肉吃懷念", "bowls": 1, "district": "新興區", "dishes": "鹹水鵝", "judges": "洪嘉聰", "cuisine": "台式", "address": "800高雄市新興區大同一路225號", "hours": "12:00–14:00 17:00–21:00", "phone": "07 241 9380", "lat": 22.6274, "lng": 120.3007, "image": "https://images.unsplash.com/photo-1518492104633-130d0cc84637?w=900&auto=format&fit=crop&q=80"}, {"name": "楊家肉圓．刈包", "bowls": 1, "district": "新興區", "dishes": "肉圓加刈包", "judges": "陳陸寬", "cuisine": "台式", "address": "800高雄市新興區六合二路57號", "hours": "18:30–01:00", "phone": "0965 709 965", "lat": 22.6308, "lng": 120.2982, "image": "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=900&auto=format&fit=crop&q=80"}, {"name": "樂嘉早餐店", "bowls": 1, "district": "新興區", "dishes": "蛋餅", "judges": "吳寶春", "cuisine": "台式", "address": "800高雄市新興區復興二路187號", "hours": "06:00–13:00", "phone": "0906 269 176", "lat": 22.6236, "lng": 120.31, "image": "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=900&auto=format&fit=crop&q=80"}, {"name": "汕頭泉成沙茶火鍋(高雄美麗島中山總店)", "bowls": 1, "district": "新興區", "dishes": "汕頭扁魚鍋", "judges": "韓勾ㄟ金針菇", "cuisine": "中式", "address": "800高雄市新興區中山橫路7號", "hours": "11:00–01:00", "phone": "07 288 5599", "lat": 22.6315, "lng": 120.3004, "image": "https://images.unsplash.com/photo-1574484284002-952d92456975?w=900&auto=format&fit=crop&q=80"}, {"name": "米院子油飯", "bowls": 1, "district": "新興區", "dishes": "鴨肉油飯", "judges": "李易", "cuisine": "台式", "address": "800高雄市新興區南海街30號", "hours": "10:45–17:00", "phone": "07 222 6699", "lat": 22.6288, "lng": 120.3104, "image": "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=900&auto=format&fit=crop&q=80"}, {"name": "郭家肉燥飯", "bowls": 1, "district": "新興區", "dishes": "滷虱目魚肚", "judges": "簡天才", "cuisine": "台式", "address": "800高雄市新興區錦田路39號", "hours": "04:00–14:00", "phone": "07 227 4373", "lat": 22.6311, "lng": 120.3114, "image": "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=900&auto=format&fit=crop&q=80"}, {"name": "阿蘭古早味", "bowls": 1, "district": "新興區", "dishes": "綜合湯、炒米粉", "judges": "江振誠", "cuisine": "台式", "address": "800高雄市新興區南華路40-32號", "hours": "06:30–14:00", "phone": "0913 555 893", "lat": 22.6302, "lng": 120.3056, "image": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=900&auto=format&fit=crop&q=80"}, {"name": "阿霞燒肉飯", "bowls": 1, "district": "新興區", "dishes": "燒肉飯", "judges": "薛舜迪", "cuisine": "台式", "address": "800高雄市新興區復興一路70號", "hours": "11:00–15:00 16:00–19:30", "phone": "07 236 1516", "lat": 22.6274, "lng": 120.3116, "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=900&auto=format&fit=crop&q=80"}, {"name": "饌食-台南小吃", "bowls": 1, "district": "新興區", "dishes": "虱目魚肚丸", "judges": "高靜玉", "cuisine": "台式", "address": "800高雄市新興區復橫一路110號", "hours": "06:15–13:30", "phone": "07 226 0985", "lat": 22.6252, "lng": 120.3106, "image": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=900&auto=format&fit=crop&q=80"}, {"name": "上品齋素麵坊", "bowls": 1, "district": "前金區", "dishes": "養生芝麻拌麵", "judges": "簡天才", "cuisine": "台式", "address": "801高雄市前金區青年二路128號", "hours": "11:00–14:00 16:30–19:30", "phone": "07 215 2582", "lat": 22.6202, "lng": 120.295, "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=900&auto=format&fit=crop&q=80"}, {"name": "前金廟切仔担", "bowls": 1, "district": "前金區", "dishes": "各色台式風味料盤、担仔麵", "judges": "郭銘哲", "cuisine": "台式", "address": "801高雄市前金區成功一路386號", "hours": "11:00–23:00", "phone": "0919 619 903", "lat": 22.6258, "lng": 120.2946, "image": "https://images.unsplash.com/photo-1552611052-33e04de081de?w=900&auto=format&fit=crop&q=80"}, {"name": "小南碗粿", "bowls": 1, "district": "前金區", "dishes": "碗粿", "judges": "簡天才", "cuisine": "台式", "address": "801高雄市前金區自強二路89號", "hours": "08:00–18:30", "phone": "07 282 8354", "lat": 22.6247, "lng": 120.2973, "image": "https://images.unsplash.com/photo-1505253758473-96b46deae2cd?w=900&auto=format&fit=crop&q=80"}, {"name": "小園日本料理", "bowls": 1, "district": "前金區", "dishes": "炸雞塊", "judges": "洪嘉聰", "cuisine": "台式", "address": "801高雄市前金區文武二街176號", "hours": "11:00–14:00 17:30–21:00", "phone": "07 251 2103", "lat": 22.6265, "lng": 120.2963, "image": "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?w=900&auto=format&fit=crop&q=80"}, {"name": "月娥鴨肉", "bowls": 1, "district": "前金區", "dishes": "鴨肉麵、滷味切盤", "judges": "薛舜迪", "cuisine": "台式", "address": "801高雄市前金區自強二路72號", "hours": "11:00–19:30", "phone": "07 211 4602", "lat": 22.6247, "lng": 120.2981, "image": "https://images.unsplash.com/photo-1514944298352-f1797c23f2b6?w=900&auto=format&fit=crop&q=80"}, {"name": "滿香屋牛肉麵", "bowls": 1, "district": "前金區", "dishes": "鮮菇牛肉麵", "judges": "張小均 (我要征服臺南牛肉湯!!!)", "cuisine": "台式", "address": "801高雄市前金區榮安街14號", "hours": "11:00–20:00", "phone": "07 231 4562", "lat": 22.6278, "lng": 120.294, "image": "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=900&auto=format&fit=crop&q=80"}, {"name": "興隆居", "bowls": 1, "district": "前金區", "dishes": "湯包", "judges": "薛舜迪", "cuisine": "台式", "address": "801高雄市前金區六合二路186號", "hours": "04:30–11:30", "phone": "07 261 6787", "lat": 22.6282, "lng": 120.2958, "image": "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=900&auto=format&fit=crop&q=80"}, {"name": "阿惠虱目魚米粉", "bowls": 1, "district": "前金區", "dishes": "虱目魚綜合湯", "judges": "郭銘哲", "cuisine": "台式", "address": "801高雄市前金區仁德街279號", "hours": "05:00–11:30", "phone": "07 241 0578", "lat": 22.6235, "lng": 120.2978, "image": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=900&auto=format&fit=crop&q=80"}, {"name": "七分香古早味臭豆腐", "bowls": 1, "district": "苓雅區", "dishes": "臭豆腐", "judges": "吳寶春", "cuisine": "台式", "address": "807高雄市苓雅區輔仁路123號", "hours": "12:00–19:00", "phone": "0930 265 332", "lat": 22.6284, "lng": 120.3339, "image": "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=900&auto=format&fit=crop&q=80"}, {"name": "于家水餃大王", "bowls": 1, "district": "苓雅區", "dishes": "水餃", "judges": "洪嘉聰", "cuisine": "台式", "address": "802高雄市苓雅區永昌街48號", "hours": "14:00–22:30", "phone": "0939 164 186", "lat": 22.6178, "lng": 120.301, "image": "https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=900&auto=format&fit=crop&q=80"}, {"name": "咖啡序事曲", "bowls": 1, "district": "苓雅區", "dishes": "咖哩雞腿排餐", "judges": "吳寶春", "cuisine": "台式", "address": "802高雄市苓雅區永定街85號", "hours": "08:00–17:00", "phone": "07 536 3618", "lat": 22.6184, "lng": 120.311, "image": "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=900&auto=format&fit=crop&q=80"}, {"name": "國民市場阿蘭雞肉", "bowls": 1, "district": "苓雅區", "dishes": "燻雞", "judges": "洪嘉聰", "cuisine": "台式", "address": "802高雄市苓雅區青年一路163之8號", "hours": "07:30–17:00", "phone": "0988 618 458", "lat": 22.6215, "lng": 120.3124, "image": "https://images.unsplash.com/photo-1514944298352-f1797c23f2b6?w=900&auto=format&fit=crop&q=80"}, {"name": "老二腿庫飯", "bowls": 1, "district": "苓雅區", "dishes": "煎虱目魚腸", "judges": "陳陸寬", "cuisine": "台式", "address": "802高雄市苓雅區興中二路118號", "hours": "20:00–03:00", "phone": "07 333 2779", "lat": 22.6196, "lng": 120.3014, "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=900&auto=format&fit=crop&q=80"}, {"name": "金大麵食坊", "bowls": 1, "district": "苓雅區", "dishes": "鮮肉餛飩乾麵", "judges": "黃鐙輝", "cuisine": "台式", "address": "802高雄市苓雅區六合路42-8號", "hours": "10:30–20:00", "phone": "07 222 9671", "lat": 22.631, "lng": 120.318, "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=900&auto=format&fit=crop&q=80"}, {"name": "高雄清真潮州牛雜餐廳", "bowls": 1, "district": "苓雅區", "dishes": "牛肉燴飯", "judges": "肥波開吃啦", "cuisine": "中式", "address": "802高雄市苓雅區建軍路13號", "hours": "10:30–21:00", "phone": "0975 273 590", "lat": 22.6242, "lng": 120.3374, "image": "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=900&auto=format&fit=crop&q=80"}, {"name": "旻哥古早味-自由店", "bowls": 1, "district": "左營區", "dishes": "炙燒比目魚牛肉燥飯", "judges": "黃鐙輝", "cuisine": "台式", "address": "813高雄市左營區重立路495號-3號", "hours": "17:00–00:00", "phone": "07 350 7181", "lat": 22.6777, "lng": 120.309, "image": "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=900&auto=format&fit=crop&q=80"}, {"name": "謙稻sign in", "bowls": 1, "district": "左營區", "dishes": "老爺爺酸白菜鍋燒意麵", "judges": "簡天才", "cuisine": "台式", "address": "813高雄市左營區子華路45號", "hours": "11:00–13:00 17:30–21:30", "phone": "0936 199 045", "lat": 22.6746, "lng": 120.3028, "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=900&auto=format&fit=crop&q=80"}, {"name": "阿亮飯糰", "bowls": 1, "district": "左營區", "dishes": "綜合飯糰", "judges": "簡天才", "cuisine": "台式", "address": "813高雄市左營區富國路255號", "hours": "06:00–11:00", "phone": "0920 038 622", "lat": 22.6598, "lng": 120.3051, "image": "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=900&auto=format&fit=crop&q=80"}, {"name": "麵點麵", "bowls": 1, "district": "左營區", "dishes": "粗乾麵", "judges": "吳寶春", "cuisine": "台式", "address": "813高雄市左營區果峰街1巷1號", "hours": "10:30–15:00 17:00–21:30", "phone": "07 582 5608", "lat": 22.6645, "lng": 120.2911, "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=900&auto=format&fit=crop&q=80"}, {"name": "老紀牛肉館", "bowls": 1, "district": "鼓山區", "dishes": "鮮牛肉麵 蔥爆牛肉", "judges": "馬世芳", "cuisine": "台式", "address": "804高雄市鼓山區明華路222-1號", "hours": "14:30–19:00", "phone": "08 232 2210", "lat": 22.6594, "lng": 120.2982, "image": "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=900&auto=format&fit=crop&q=80"}, {"name": "阿嬤ㄟ麻油雞飯", "bowls": 1, "district": "鼓山區", "dishes": "麻油雞飯", "judges": "Lulu 黃路梓茵", "cuisine": "台式", "address": "804高雄市鼓山區裕誠路1128號", "hours": "17:00–00:00", "phone": "0938 795 280", "lat": 22.6616, "lng": 120.2928, "image": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=900&auto=format&fit=crop&q=80"}, {"name": "古早味碗粿土魠魚羹", "bowls": 1, "district": "前鎮區", "dishes": "碗粿", "judges": "吳寶春", "cuisine": "台式", "address": "806高雄市前鎮區民權二路469號", "hours": "06:00–12:30", "phone": "", "lat": 22.608, "lng": 120.3156, "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=900&auto=format&fit=crop&q=80"}, {"name": "阿得肉燥飯", "bowls": 1, "district": "前鎮區", "dishes": "鮮魚湯", "judges": "吳寶春", "cuisine": "台式", "address": "806高雄市前鎮區復興三路439號", "hours": "06:00–21:00", "phone": "07 331 6876", "lat": 22.6062, "lng": 120.3098, "image": "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=900&auto=format&fit=crop&q=80"}, {"name": "Chào Hà Nội - 河內創意料理", "bowls": 1, "district": "楠梓區", "dishes": "特定牛肉河粉", "judges": "張小均 (我要征服臺南牛肉湯!!!)", "cuisine": "台式", "address": "811高雄市楠梓區惠民路342號", "hours": "11:00–15:00 17:00–20:30", "phone": "0916 198 017", "lat": 22.7298, "lng": 120.3042, "image": "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=900&auto=format&fit=crop&q=80"}, {"name": "右昌肉圓", "bowls": 1, "district": "楠梓區", "dishes": "肉圓", "judges": "黃鐙輝", "cuisine": "台式", "address": "811高雄市楠梓區右昌街261號", "hours": "06:00–18:00", "phone": "07 363 0361", "lat": 22.7166, "lng": 120.2996, "image": "https://images.unsplash.com/photo-1555126634-323283e090fa?w=900&auto=format&fit=crop&q=80"}, {"name": "大社嘉義黑香腸", "bowls": 1, "district": "大社區", "dishes": "黑香腸、皇帝豆糯米腸", "judges": "郭銘哲", "cuisine": "台式", "address": "815高雄市大社區中山路7號", "hours": "14:00–19:00", "phone": "0912 117 718", "lat": 22.7316, "lng": 120.348, "image": "https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=900&auto=format&fit=crop&q=80"}, {"name": "朱媽媽牛肉湯", "bowls": 1, "district": "湖內區", "dishes": "蒜頭牛肉湯", "judges": "張小均 (我要征服臺南牛肉湯!!!)", "cuisine": "台式", "address": "829高雄市湖內區中山路一段160號", "hours": "07:30–19:00", "phone": "0937 367 029", "lat": 22.8972, "lng": 120.2234, "image": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=900&auto=format&fit=crop&q=80"}, {"name": "旗山秀明豬心冬粉", "bowls": 1, "district": "旗山區", "dishes": "豬舌乾冬粉", "judges": "馬世芳", "cuisine": "台式", "address": "842高雄市旗山區永平街41號", "hours": "06:00–13:30", "phone": "08 232 7292", "lat": 22.8875, "lng": 120.482, "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=900&auto=format&fit=crop&q=80"}];
+
+    let map;
+    let markersLayer = L.layerGroup();
+    let currentDistrict = 'all';
+    let searchQuery = '';
+    let markerMap = {};
+
+    // Initialize Page
+    document.addEventListener('DOMContentLoaded', () => {
+      initMap();
+      renderDistrictPills();
+      renderCards();
+    });
+
+    // Initialize Leaflet Map
+    function initMap() {
+      // Kaohsiung Center
+      map = L.map('kaohsiung-map', {
+        center: [22.6360, 120.3060],
+        zoom: 13,
+        scrollWheelZoom: true
+      });
+
+      // High-quality OpenStreetMap / CartoDB Voyager tiles (clean, Google Maps aesthetic)
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 19
+      }).addTo(map);
+
+      markersLayer.addTo(map);
+      updateMapMarkers(RESTAURANTS);
+    }
+
+    // Switch between custom interactive map and official Google My Maps embed
+    function switchMapMode(mode) {
+      const customMapEl = document.getElementById('kaohsiung-map');
+      const googleEmbedEl = document.getElementById('google-embed-container');
+      const btnCustom = document.getElementById('btn-toggle-custom-map');
+      const btnGoogle = document.getElementById('btn-toggle-google-embed');
+
+      if (mode === 'google') {
+        customMapEl.style.display = 'none';
+        googleEmbedEl.style.display = 'block';
+        btnGoogle.classList.add('active');
+        btnCustom.classList.remove('active');
+      } else {
+        googleEmbedEl.style.display = 'none';
+        customMapEl.style.display = 'block';
+        btnCustom.classList.add('active');
+        btnGoogle.classList.remove('active');
+        map.invalidateSize();
+      }
+    }
+
+    // Reset Map View
+    function resetMapView() {
+      switchMapMode('leaflet');
+      map.setView([22.6360, 120.3060], 13);
+    }
+
+    // Update markers on the map
+    function updateMapMarkers(placesToRender) {
+      markersLayer.clearLayers();
+      markerMap = {};
+
+      placesToRender.forEach((r, idx) => {
+        const is2Bowls = r.bowls === 2;
+        const iconHtml = is2Bowls 
+          ? `<div class="marker-pin-wrap"><div class="pin-2bowls"><span>2碗</span></div></div>`
+          : `<div class="marker-pin-wrap"><div class="pin-1bowl"><span>1碗</span></div></div>`;
+
+        const customIcon = L.divIcon({
+          html: iconHtml,
+          className: '',
+          iconSize: [32, 32],
+          iconAnchor: [16, 32],
+          popupAnchor: [0, -32]
+        });
+
+        const googleNavUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.name + ' ' + r.address)}`;
+
+        const popupContent = `
+          <div class="map-popup-card">
+            <img class="map-popup-img" src="${r.image}" alt="${r.name}" onerror="this.src='https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80'" />
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-size:0.75rem; font-weight:700; color:${is2Bowls ? '#D97706':'#C2410C'};">
+                ${is2Bowls ? '🏆 2碗得主' : '⭐ 1碗推薦'}
+              </span>
+              <span style="font-size:0.75rem; background:#F1F5F9; padding:2px 6px; border-radius:4px; font-weight:600;">
+                ${r.district}
+              </span>
+            </div>
+            <div class="map-popup-title">${r.name}</div>
+            <div class="map-popup-dish">🍲 推薦：${r.dishes}</div>
+            <div style="font-size:0.75rem; color:#64748B; margin-bottom:4px;">👨‍🍳 評審：${r.judges}</div>
+            <div class="map-popup-addr"><i class="fa-solid fa-location-dot"></i> ${r.address}</div>
+            <a class="map-popup-btn" href="${googleNavUrl}" target="_blank" rel="noopener">
+              <i class="fa-brands fa-google"></i> 在 Google 地圖開啟導航
+            </a>
+          </div>
+        `;
+
+        const marker = L.marker([r.lat, r.lng], { icon: customIcon })
+          .bindPopup(popupContent);
+
+        markersLayer.addLayer(marker);
+        markerMap[r.name] = marker;
+      });
+    }
+
+    // Render District Filter Pills
+    function renderDistrictPills() {
+      const districtCounts = {};
+      RESTAURANTS.forEach(r => {
+        districtCounts[r.district] = (districtCounts[r.district] || 0) + 1;
+      });
+
+      const pillsContainer = document.getElementById('district-pills');
+      
+      DISTRICT_ORDER.forEach(d => {
+        if (districtCounts[d]) {
+          const pill = document.createElement('div');
+          pill.className = 'pill';
+          pill.dataset.district = d;
+          pill.onclick = () => filterByDistrict(d);
+          pill.innerHTML = `${d} <span class="pill-count">${districtCounts[d]}</span>`;
+          pillsContainer.appendChild(pill);
+        }
+      });
+    }
+
+    // Filter Logic
+    function getFilteredData() {
+      return RESTAURANTS.filter(r => {
+        // District filter
+        let matchDistrict = true;
+        if (currentDistrict === '2bowls') {
+          matchDistrict = (r.bowls === 2);
+        } else if (currentDistrict !== 'all') {
+          matchDistrict = (r.district === currentDistrict);
+        }
+
+        // Search query
+        let matchSearch = true;
+        if (searchQuery) {
+          const q = searchQuery.toLowerCase();
+          matchSearch = (
+            r.name.toLowerCase().includes(q) ||
+            r.dishes.toLowerCase().includes(q) ||
+            r.judges.toLowerCase().includes(q) ||
+            r.district.toLowerCase().includes(q) ||
+            r.address.toLowerCase().includes(q)
+          );
+        }
+
+        return matchDistrict && matchSearch;
+      });
+    }
+
+    // Filter by district click
+    function filterByDistrict(dist) {
+      currentDistrict = dist;
+      
+      // Update active pill UI
+      document.querySelectorAll('.district-pills .pill').forEach(el => {
+        if (el.dataset.district === dist) {
+          el.classList.add('active');
+        } else {
+          el.classList.remove('active');
+        }
+      });
+
+      renderCards();
+    }
+
+    // Handle real-time search
+    function handleSearch() {
+      searchQuery = document.getElementById('search-input').value.trim();
+      renderCards();
+    }
+
+    // Render Cards & Sync Map
+    function renderCards() {
+      const filtered = getFilteredData();
+      const grid = document.getElementById('restaurant-grid');
+      const countEl = document.getElementById('display-count');
+      countEl.textContent = filtered.length;
+
+      updateMapMarkers(filtered);
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <i class="fa-solid fa-utensils"></i>
+            <h3>查無符合的餐廳</h3>
+            <p>請嘗試更換搜尋關鍵字或選擇其他行政區標籤</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Fit map to filtered bounds if there are items and not in default all
+      if (filtered.length > 0 && currentDistrict !== 'all' && currentDistrict !== '2bowls') {
+        const group = new L.featureGroup(Object.values(markerMap));
+        map.fitBounds(group.getBounds().pad(0.15));
+      }
+
+      grid.innerHTML = filtered.map(r => {
+        const is2Bowls = r.bowls === 2;
+        const googleNavUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.name + ' ' + r.address)}`;
+
+        // Parse judges into chips
+        const judgeList = r.judges.split('、').map(j => `<span class="judge-chip">${j.trim()}</span>`).join('');
+
+        return `
+          <article class="card">
+            <div class="card-img-wrap">
+              <img 
+                class="card-img" 
+                src="${r.image}" 
+                alt="${r.name}" 
+                loading="lazy"
+                onerror="this.src='https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&auto=format&fit=crop&q=80'"
+              />
+              <span class="badge-bowl ${is2Bowls ? 'gold' : 'silver'}">
+                ${is2Bowls ? '<i class="fa-solid fa-trophy"></i> 2碗殊榮' : '<i class="fa-solid fa-bowl-rice"></i> 1碗入選'}
+              </span>
+              <span class="badge-district">
+                <i class="fa-solid fa-map-pin"></i> ${r.district}
+              </span>
+            </div>
+
+            <div class="card-body">
+              <div class="card-title-row">
+                <h3 class="card-title">${r.name}</h3>
+                <span class="card-cuisine">${r.cuisine || '台式小吃'}</span>
+              </div>
+
+              <!-- 得獎菜色 -->
+              <div class="winning-dish-block">
+                <div class="winning-dish-label">
+                  <i class="fa-solid fa-utensils"></i> 500碗評選得獎菜色
+                </div>
+                <div class="winning-dish-text">
+                  ${r.dishes}
+                </div>
+              </div>
+
+              <!-- 評選標準與評審 -->
+              <div class="judges-row">
+                <i class="fa-solid fa-user-check"></i>
+                <span style="font-weight:600;">評審推薦：</span>
+                <div class="judges-chips">${judgeList}</div>
+              </div>
+
+              <!-- 店家資訊 -->
+              <div class="card-meta">
+                <div class="meta-item">
+                  <i class="fa-solid fa-location-dot"></i>
+                  <span>${r.address}</span>
+                </div>
+                ${r.hours ? `
+                  <div class="meta-item">
+                    <i class="fa-solid fa-clock"></i>
+                    <span>${r.hours}</span>
+                  </div>
+                ` : ''}
+                ${r.phone ? `
+                  <div class="meta-item">
+                    <i class="fa-solid fa-phone"></i>
+                    <span><a href="tel:${r.phone.replace(/\s+/g, '')}" style="color:inherit; text-decoration:none;">${r.phone}</a></span>
+                  </div>
+                ` : ''}
+              </div>
+
+              <!-- 按鈕操作區 -->
+              <div class="card-actions">
+                <button class="btn-locate" onclick="focusOnMap('${r.name}', ${r.lat}, ${r.lng})">
+                  <i class="fa-solid fa-crosshairs"></i> 在地圖定位
+                </button>
+                <a class="btn-map-nav" href="${googleNavUrl}" target="_blank" rel="noopener">
+                  <i class="fa-brands fa-google"></i> Google 導航
+                </a>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    // Focus on marker and scroll map into view
+    function focusOnMap(name, lat, lng) {
+      switchMapMode('leaflet');
+      const mapEl = document.getElementById('map-part');
+      mapEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      
+      setTimeout(() => {
+        map.setView([lat, lng], 16, { animate: true });
+        if (markerMap[name]) {
+          markerMap[name].openPopup();
+        }
+      }, 400);
+    }
+  </script>
+</body>
+</html>
